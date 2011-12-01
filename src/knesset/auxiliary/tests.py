@@ -1,16 +1,24 @@
 import datetime
 import re
+import json
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.contrib.auth.models import User
+from django.contrib.comments.models import Comment
 from django.utils import translation
 from django.conf import settings
+from django.template import Context, Template
+
 from tagging.models import Tag,TaggedItem
+from annotatetext.models import Annotation
+
 from knesset.laws.models import Vote, VoteAction, Bill
 from knesset.mks.models import Member,Party,WeeklyPresence
 from knesset.agendas.models import Agenda
-from django.utils import simplejson as json
+from knesset.committees.models import Committee, CommitteeMeeting, ProtocolPart
+
 
 class InternalLinksTest(TestCase):
 
@@ -85,3 +93,28 @@ class InternalLinksTest(TestCase):
         #f = open('internal_links_tested.txt','wt')
         #f.write('\n'.join(visited_links))
         #f.close()
+
+class TemplateTagTest(TestCase):
+
+    def setUp(self):
+        user = User.objects.create(username="user")
+        committee = Committee.objects.create(name="comiti")
+
+        tba = CommitteeMeeting.objects.create(committee=committee, 
+                    date_string="1st Jan 1970", date=datetime.date(1970,1,1))
+        pp = ProtocolPart.objects.create(meeting=tba, order=1)
+        self.objects = [committee, tba, pp,
+                    Annotation.objects.create(user=user, content_object=pp,
+                    selection_start=22, selection_end=45,
+                    comment=u"This is the Python way")]
+        bill = Bill.objects.create(title="debil", slug="debil", stage='?')
+        self.objects.extend ((bill,
+            Comment.objects.create(content_object=bill, comment="lovely day",
+                                   site_id = 0)))
+       
+
+    def testObjectStamp(self):
+        t = Template("{% load common_tags %} {% for i in objs %}{% object_stamp i %}{% endfor %}}")
+
+        out = t.render(Context({'objs': self.objects}))
+        self.assertTrue(out)

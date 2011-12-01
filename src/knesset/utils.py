@@ -123,3 +123,17 @@ def notify_responsible_adult(msg):
     if adults:
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'email@example.com')    
         send_html_mail(_('Open Knesset requires attention'), msg, msg, from_email, adults)
+
+def get_all_objects():
+    ''' code from dumpdata that returns all the objects in the system '''
+    from django.db import connections, router, DEFAULT_DB_ALIAS
+
+    app_list = SortedDict((app, None) for app in get_apps() if app not in excluded_apps)
+    objects = []
+    for model in sort_dependencies(app_list.items()):
+        if not model._meta.proxy and router.allow_syncdb(using, model):
+            if use_base_manager:
+                objects.extend(model._base_manager.using(using).all())
+            else:
+                objects.extend(model._default_manager.using(using).all())
+    return objects

@@ -1,0 +1,50 @@
+{% load avatar_tags %}
+{% if comment.content_type.model == "bill" %}
+    <p style="clear:both;text-align:center; ">
+    {% with bill=comment.content_object %}
+        <a href="{{ bill.get_absolute_url }}">{{bill}}</a>
+    {% endwith %}
+    </p>
+{% else %}{% if comment.content_type.model == "vote" %}
+    <p style="clear:both;text-align:center; ">
+    {% with vote=comment.content_object %}
+        <a href="{{ vote.get_absolute_url }}">{{vote}}</a>
+    {% endwith %}
+    </p>
+{% else %}{% if comment.content_type.model == "topic" %}
+    <div style="clear:both;">
+        <div class="item-credit">
+            {% if comment.content_object.creator %}
+                {% with comment.content_object.creator as u %}
+                    <a href="{% url public-profile u.username %}">{% firstof u.get_full_name u.user %}</a>
+                {% endwith %}
+            {% endif %}
+        </div>
+        <a href="{{comment.content_object.get_absolute_url}}"><strong>{{comment.content_object.title}}</strong>
+        <p>{{ comment.content_object.description|truncatewords:30|linebreaksbr }}</p>
+        </a>
+    </div>
+{% else %} 
+    <p style="clear:both;text-align:center; ">
+    {% with x=comment.content_object %}
+        <a href="{{ x.get_absolute_url }}">{{x}}</a>
+    {% endwith %}
+{% endif %}{% endif %}{% endif %}
+<div class="item-comments">
+{% for c in previous_comments|add:comment %}
+    <div class="item-header">
+        <div class="avatar-item">
+            <a href="{% url public-profile c.user.username %}">
+                {% avatar c.user 48 %}
+            </a>
+        </div>
+        <p class="username">
+            <a href="{% url public-profile c.user.username %}">
+                {% firstof c.user.get_full_name c.user %}
+            </a>
+        </p>
+    </div>
+    <p class="triangle-border right">
+    {{c.comment|urlizetrunc:20|linebreaksbr}}
+    </p>
+{% endfor %}

@@ -1,0 +1,12 @@
+<div class="item-header">
+    <div class="avatar-item">
+        <a href="{% url public-profile user.username %}">
+            {% avatar user 48 %}
+        </a>
+    </div>
+    <p class="username">
+        <a href="{% url public-profile user.username %}">
+            {% firstof user.get_full_name user %}
+        </a>
+    </p>
+</div>

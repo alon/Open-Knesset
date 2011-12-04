@@ -1,0 +1,23 @@
+{% load avatar_tags %}
+<p style="clear:both;">
+    <strong>{{annotation.content_object.header}}</strong>: "{{annotation.selection|truncatewords:30}}",
+    <a href="{{annotation.get_absolute_url}}">{{ annotation.content_object.meeting|linebreaksbr }}</a>
+</p>
+<div class="item-comments">
+    <div class="item-header">
+        <div class="avatar-item">
+            <a href="{% url public-profile annotation.user.username %}">
+                {% avatar annotation.user 48 %}
+            </a>
+        </div>
+        <p class="username">
+            <a href="{% url public-profile annotation.user.username %}">
+                {% firstof annotation.user.get_full_name annotation.user %}
+            </a>
+        </p>
+    </div>
+    <p class="triangle-border right">
+    {{annotation.comment|urlizetrunc:20|linebreaksbr}}
+    </p>
+</div>
+

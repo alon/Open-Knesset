@@ -1,0 +1,22 @@
+{% load avatar_tags %}
+<p style="clear:both;">
+</p>
+<div class="item-comments">
+    {% if object.user %}
+    <div class="item-header">
+        <div class="avatar-item">
+            <a href="{% url public-profile object.user.username %}">
+                {% avatar object.user 48 %}
+            </a>
+        </div>
+        <p class="username">
+            <a href="{% url public-profile object.user.username %}">
+                {% firstof object.user.get_full_name object.user %}
+            </a>
+        </p>
+    </div>
+    {% endif %}
+    <p class="stamp">
+        {{object|urlizetrunc:20|linebreaksbr}}
+    </p>
+</div>
